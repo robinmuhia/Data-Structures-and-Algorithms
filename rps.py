@@ -1,4 +1,3 @@
-
 import random
 computer_choices = ("rock", 'paper', 'scissors')
 player_wins = 0

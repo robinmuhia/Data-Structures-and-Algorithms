@@ -1,0 +1,21 @@
+def count_construct(target:str,word_bank:list,memo:dict={})->bool:
+    if target in memo:
+        return memo[target]
+    if target == '':
+        return 1
+    
+    count =  0
+    for word in word_bank:
+        try:
+            if target.index(word) == 0:
+                rest = count_construct(target[len(word):],word_bank)
+                count += rest
+        except:
+            continue
+
+    memo[target] = count
+    return count
+
+print(count_construct('enterapotentpot',['a','p','ent','enter','ot','o','t']))
+print(count_construct('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeef',['e','ee','eee','eeee','eeeee']))
+

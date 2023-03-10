@@ -9,6 +9,9 @@ def grid_traveler(x:int,y:int,memo={}):
     else:
         memo[key] = grid_traveler(x-1,y,memo) + grid_traveler(x,y-1,memo)
     return memo[key]
+
+
+print(grid_traveler(2,3))
     
     
     

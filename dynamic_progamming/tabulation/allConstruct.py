@@ -11,6 +11,3 @@ def all_construct(target: str, words: list) -> list:
     return table[len(target)]
 
 
-print(all_construct('enterapotentpot',['a','p','ent','enter','ot','o','t']))
-print(all_construct('purple',['purp','p','ur','le','purpl']))
-print(all_construct('eeeeeeeeeeeeeeeeeeeeeeef',['e','ee','eee','eeee','eeeee']))

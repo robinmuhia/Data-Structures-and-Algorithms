@@ -1,12 +1,7 @@
-num_nodes = 5
+row_inbounds = 0 <= 2 and 3 < 4
+col_inbounds = 0 <= 1 and 2 < 4
 
-lst  = []
-arr = []
-for i in range(num_nodes):
-    for j in range(num_nodes):
-        lst.append(0)
-    arr.append(lst)
-    lst = []
-    
-# print(arr)      
+
+print(row_inbounds,col_inbounds)
+
 

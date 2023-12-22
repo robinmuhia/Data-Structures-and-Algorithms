@@ -1,33 +1,91 @@
-wins_tictactoe= 0
-draws_tictactoe = 0
-losses_tictactoe = 0
-
-
-#the game's main core is from Kylie Ying. I struggled with this and i have to give credit to her. Nonetheless, I came to understand classes and functions deeply due to her. Whatever my career in software development comes to be, i would really like to thank her and freecodecamp.
-
 import math
 import random
 import time
+from abc import ABC,abstractmethod
+from typing import List,Dict
 
+class TicTacToe():
+    """Class for a TicTacToe game."""
+    def __init__(self):
+        """Constructor for this class."""
+        self.board = self.make_board()
+        self.current_winner:str | None = None    
 
-is_playing = True
-name = input('Name:').title()    
-player_choice = ''
+    @staticmethod
+    def make_board() -> List[str]:
+        """Makes the board for a player to play in."""
+        return [' ' for _ in range(9)]
 
+    def print_board(self) -> None:
+        """Prints the board to a user for viewing."""
+        for row in [self.board[i*3:(i+1) * 3] for i in range(3)]:
+            print('| ' + ' | '.join(row) + ' |')
 
-class Player():
-    def __init__(self, letter):
+    @staticmethod
+    def print_board_nums() -> None:
+        """Prints the numbers on the board"""
+        number_board = [[str(i) for i in range(j*3, (j+1)*3)] for j in range(3)]
+        for row in number_board:
+            print('| ' + ' | '.join(row) + ' |')
+
+    def make_move(self, square, letter) -> bool:
+        """Functionality that makes the intended legal move."""
+        if self.board[square] == ' ':
+            self.board[square] = letter
+            if self.winner(square, letter):
+                self.current_winner = letter
+            return True
+        return False
+
+    def winner(self, square, letter) -> bool:
+        """Finds out whether a player has won the game."""
+        row_ind = math.floor(square / 3)
+        row = self.board[row_ind*3:(row_ind+1)*3]
+        if all([s == letter for s in row]):
+            return True
+        col_ind = square % 3
+        column = [self.board[col_ind+i*3] for i in range(3)]
+        if all([s == letter for s in column]):
+            return True
+        if square % 2 == 0:
+            diagonal1 = [self.board[i] for i in [0, 4, 8]]
+            if all([s == letter for s in diagonal1]):
+                return True
+            diagonal2 = [self.board[i] for i in [2, 4, 6]]
+            if all([s == letter for s in diagonal2]):
+                return True
+        return False
+
+    def empty_squares(self) -> List[str]:
+        """Puts empty spaces in board."""
+        return ' ' in self.board
+
+    def num_empty_squares(self) -> int:
+        """Calculates number of empty spaces on the board."""
+        return self.board.count(' ')
+
+    def available_moves(self):
+        """Returns a list of all availabe legal moves."""
+        return [i for i, x in enumerate(self.board) if x == " "]  
+class Player(ABC):
+    """Instantiate a standard player."""
+    def __init__(self, letter:str):
         self.letter = letter
 
-    def get_move(self, game):
+    @abstractmethod
+    def get_move(self, game:TicTacToe):
+        """Base functionality to get a legal move"""
         pass
 
 
 class HumanPlayer(Player):
-    def __init__(self, letter):
+    """Class for a human player"""
+    def __init__(self, letter:str):
+        """Constructor for a human player."""
         super().__init__(letter)
 
-    def get_move(self, game):
+    def get_move(self, game) -> int:
+        """Gets a move from a player and validates it."""
         valid_square = False
         val = None
         while not valid_square:
@@ -43,26 +101,32 @@ class HumanPlayer(Player):
 
 
 class RandomComputerPlayer(Player):
-    def __init__(self, letter):
+    """Class for a computer making random moves."""
+    def __init__(self, letter:str):
+        """Constructor for the human class."""
         super().__init__(letter)
 
     def get_move(self, game):
+        """Randomnly gets a move from the available moves."""
         square = random.choice(game.available_moves())
         return square
 
 
 class SmartComputerPlayer(Player):
-    def __init__(self, letter):
+    """Class for a smart computer player."""
+    def __init__(self, letter:str):
         super().__init__(letter)
 
     def get_move(self, game):
+        """Implements a minimax algorithm to get the best move possible."""
         if len(game.available_moves()) == 9:
             square = 4
         else:
             square = self.minimax(game, self.letter)['position']
         return square
 
-    def minimax(self, state, player):
+    def minimax(self, state:TicTacToe, player:Player) -> dict[str: int]:
+        """Implemenation of the minimax algorithm."""
         max_player = self.letter  # yourself
         other_player = 'O' if player == 'X' else 'X'
 
@@ -95,168 +159,131 @@ class SmartComputerPlayer(Player):
         return best
 
 
+class PlayGame():
+    """Instantiate this class and play a tictactoe game"""
 
-class TicTacToe():
-    def __init__(self):
-        self.board = self.make_board()
-        self.current_winner = None    
+    def play(self,game:TicTacToe,human_player:Player, computer_player:Player,score:dict[str, int],player_choice:str,print_game=True,):
+        """Starts the game"""
 
-    @staticmethod
-    def make_board():
-        return [' ' for _ in range(9)]
+        if print_game:
+            game.print_board_nums()
 
-    def print_board(self):
-        for row in [self.board[i*3:(i+1) * 3] for i in range(3)]:
-            print('| ' + ' | '.join(row) + ' |')
-
-    @staticmethod
-    def print_board_nums():
-        # 0 | 1 | 2
-        number_board = [[str(i) for i in range(j*3, (j+1)*3)] for j in range(3)]
-        for row in number_board:
-            print('| ' + ' | '.join(row) + ' |')
-
-    def make_move(self, square, letter):
-        if self.board[square] == ' ':
-            self.board[square] = letter
-            if self.winner(square, letter):
-                self.current_winner = letter
-            return True
-        return False
-
-    def winner(self, square, letter):
-        # check the row
-        row_ind = math.floor(square / 3)
-        row = self.board[row_ind*3:(row_ind+1)*3]
-        # print('row', row)
-        if all([s == letter for s in row]):
-            return True
-        col_ind = square % 3
-        column = [self.board[col_ind+i*3] for i in range(3)]
-        # print('col', column)
-        if all([s == letter for s in column]):
-            return True
-        if square % 2 == 0:
-            diagonal1 = [self.board[i] for i in [0, 4, 8]]
-            # print('diag1', diagonal1)
-            if all([s == letter for s in diagonal1]):
-                return True
-            diagonal2 = [self.board[i] for i in [2, 4, 6]]
-            # print('diag2', diagonal2)
-            if all([s == letter for s in diagonal2]):
-                return True
-        return False
-
-    def empty_squares(self):
-        return ' ' in self.board
-
-    def num_empty_squares(self):
-        return self.board.count(' ')
-
-    def available_moves(self):
-        return [i for i, x in enumerate(self.board) if x == " "]  
-
-
-        
-
-def play(game,x_player, o_player, print_game=True):
-
-    if print_game:
-        game.print_board_nums()
-
-    letter = 'X'
-    while game.empty_squares():
-        if letter == 'O':
-            square = o_player.get_move(game)
+        if human_player.letter == "X":
+            x_player = human_player
+            o_player = computer_player
         else:
-            square = x_player.get_move(game)
-        if game.make_move(square, letter):
+            x_player = computer_player
+            o_player = human_player
 
-            if print_game:
-                print(letter + ' makes a move to square {}'.format(square))
-                game.print_board()
-                print('')
-
-            if game.current_winner:
-                if print_game:
-                    print(letter + ' wins!')
-                    if (player_choice == 'X' and game.current_winner == 'X') or (player_choice == 'O' and game.current_winner == 'O'):
-                        global wins_tictactoe
-                        wins_tictactoe += 1
-                    else:                    
-                        global losses_tictactoe
-                        losses_tictactoe += 1   
-                return letter  # ends the loop and exits the game
-            letter = 'O' if letter == 'X' else 'X'  # switches player
-
-        time.sleep(.8)
-
-    if print_game:
-        print('It\'s a tie!')
-        global draws_tictactoe
-        draws_tictactoe += 1  
-
-
-
-
-while is_playing:
-    x_player = 0
-    o_player = 0
-    t= TicTacToe()
-
-    print("Type 'X' to use X or 'O' to use O  or Q to quit")
-
-    player_input = input('>').upper()
-
-    if player_input == 'Q':
-        if wins_tictactoe > 0 or draws_tictactoe or losses_tictactoe:
-            is_playing = False
-            print("Game over!") 
-            print(f'You won {wins_tictactoe} times')   
-            print(f'You drew {draws_tictactoe} times') 
-            print(f'You lost {losses_tictactoe} times') 
-            if wins_tictactoe > losses_tictactoe:
-                print(f'Congratulations {name}. You defeated the computer more times!')
-            elif losses_tictactoe > wins_tictactoe:
-                print (f'You suck,{name}! You lost more times to the computer!')  
+        letter = 'X'
+        while game.empty_squares():
+            if letter == 'O':
+                square = o_player.get_move(game)
             else:
-                print('You drew with the computer!')
-            break
-        else:
-            is_playing = False
-            print('Maybe next time')
-            break
-        break
-    elif player_input == 'X':
-        x_player = HumanPlayer('X')
-        player_choice = 'X'
-        print('Choose a difficulty. Input 1 for easy or 2 for hard')        
-        player_difficulty = input('>')
-        if player_difficulty == '1':
-            o_player = RandomComputerPlayer('O')
-            play(t,x_player,o_player,print_game=True)
-        elif player_difficulty == '2':
-            o_player = SmartComputerPlayer('O')
-            play(t,x_player,o_player,print_game=True)
-        else:
-            print('Invalid number!. Please type 1 for easy or 2 for hard!')
-            break       
-    elif player_input == 'O':
-        o_player = HumanPlayer('O')
-        player_choice = 'O'
-        print('Choose a difficulty. Input 1 for easy or 2 for hard')    
-        player_difficulty = input('>')
-        if player_difficulty == '1':
-            x_player = RandomComputerPlayer('X')
-            play(t,x_player,o_player,print_game=True)
-        elif player_difficulty == '2':
-            x_player = SmartComputerPlayer('X')
-            play(t,x_player,o_player,print_game=True)
-        else:
-            print('Invalid number! Please type in 1 for easy or 2 for hard!')
-    else:
-        ('Invalid input! Please type in X to use x or O to use o')         
+                square = x_player.get_move(game)
+            if game.make_move(square, letter):
 
+                if print_game:
+                    print(letter + ' makes a move to square {}'.format(square))
+                    game.print_board()
+                    print('')
+
+                if game.current_winner:
+                    if print_game:
+                        print(letter + ' wins!')
+                        if (player_choice == 'X' and game.current_winner == 'X') or (player_choice == 'O' and game.current_winner == 'O'):
+                            score["wins"] += 1
+                        else:                    
+                            score["loss"] += 1   
+                    return letter  # ends the loop and exits the game
+                letter = 'O' if letter == 'X' else 'X'  # switches player
+
+            time.sleep(.8)
+
+        if print_game:
+            print('It\'s a tie!')
+            score["draw"] += 1  
+
+
+    def choose_letter(self) -> str:
+        """Choose letter to play with."""
+        choices = ["X", "O", "Q"]
+
+        print("Type 'X' to use X or 'O' to use O or 'Q' to quit")
+        while True:
+            player_input = input('>').upper()
+
+            if player_input in choices:
+                return player_input
+            else:
+                print('Invalid input! Please enter X, O, or Q.')
+
+    def choose_difficulty(self) -> int:
+        """Choose the difficulty you want to play, i.e., smart player or random player."""
+        choices = [1, 2]
+        print('Choose a difficulty. Input 1 for easy or 2 for hard')
+        while True:
+            difficulty = input(">")
+
+            try:
+                difficulty = int(difficulty)
+                if difficulty in choices:
+                    return difficulty
+                else:
+                    print("Invalid choice. Please enter 1 or 2.")
+            except ValueError:
+                print("Invalid choice. Please enter 1 or 2.")
+
+    @staticmethod
+    def boot_game(player_input:str,diffculty:int):
+        """Boots up the game."""
+        human_player = HumanPlayer(player_input)
+        computer_letter = "X" if player_input == "O" else "O"
+        if diffculty == 1:
+            computer_player = RandomComputerPlayer(computer_letter)
+        else:
+            computer_player = SmartComputerPlayer(computer_letter)
+        return human_player,computer_player
+
+
+    def start_game(self,score:Dict[str,int],name:str) -> None:
+        """Starts a game instance"""
+        wins = score['wins']
+        loss = score["loss"]
+        draw = score["draw"]
+
+        game= TicTacToe()
+        chosen_letter = self.choose_letter()
+
+        if chosen_letter == 'Q':
+            if wins > 0 or draw or loss:
+                print("Game over!") 
+                print(f'You won {wins} times')   
+                print(f'You drew {draw} times') 
+                print(f'You lost {loss} times') 
+                if wins > loss:
+                    print(f'Congratulations {name}. You defeated the computer more times!')
+                elif loss > wins:
+                    print (f'You suck,{name}! You lost more times to the computer!')  
+                else:
+                    print('You drew with the computer!')
+            else:
+                print('Maybe next time')
+            return
+
+        difficulty = self.choose_difficulty()
+        human_player,computer_player = self.boot_game(chosen_letter,difficulty)
+        self.play(game=game,human_player=human_player,computer_player=computer_player,score=score,player_choice=chosen_letter)
+        return self.start_game(score=score,name=name)    
+
+    def play_multilple_games(self,score = {
+            "wins" : 0,
+            "loss": 0,
+            "draw": 0,
+        }) -> None:
+        """Start this to play multiple tictactoe games."""
+        name = input('Name:').title() 
+        self.start_game(score=score,name=name)
 
 
 

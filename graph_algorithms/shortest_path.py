@@ -1,7 +1,7 @@
 def buildgraph(edges):
     graph = {}
     for edge in edges:
-        a,b = edge
+        a, b = edge
         if a not in graph:
             graph[a] = []
         if b not in graph:
@@ -11,11 +11,11 @@ def buildgraph(edges):
     return graph
 
 
-def shortest_path(edges,nodeA,nodeB):
+def shortest_path(edges, nodeA, nodeB):
     graph = buildgraph(edges)
     visited = set()
     visited.add(nodeA)
-    queue = [[nodeA,0]]
+    queue = [[nodeA, 0]]
     while len(queue) > 0:
         node, distance = queue.pop(0)
         if node == nodeB:
@@ -23,18 +23,11 @@ def shortest_path(edges,nodeA,nodeB):
         for neighbor in graph[node]:
             if neighbor not in visited:
                 visited.add(neighbor)
-                queue.append([neighbor,distance+1])
-    
-    return -1   
-    
-    
+                queue.append([neighbor, distance + 1])
 
-edges = [
-    ['w','x'],
-    ['x','y'],
-    ['z','y'],
-    ['z','v'],
-    ['w','v']
-]
+    return -1
 
-print(shortest_path(edges,'w','z'))
+
+edges = [["w", "x"], ["x", "y"], ["z", "y"], ["z", "v"], ["w", "v"]]
+
+print(shortest_path(edges, "w", "z"))

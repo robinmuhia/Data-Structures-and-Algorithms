@@ -1,4 +1,4 @@
-def bestSum(targetSum:int, numbers:list, memo:dict={}) -> list:
+def bestSum(targetSum: int, numbers: list, memo: dict = {}) -> list:
     if targetSum in memo:
         return memo[targetSum][:]
     if targetSum == 0:
@@ -21,8 +21,8 @@ def bestSum(targetSum:int, numbers:list, memo:dict={}) -> list:
         memo[targetSum] = shortestCombi[:]
     else:
         memo[targetSum] = None
-    
+
     return shortestCombi
 
 
-print(bestSum(100,[1,2,5,25]))
+print(bestSum(100, [1, 2, 5, 25]))

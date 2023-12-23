@@ -33,8 +33,7 @@ class Hangman:
         self.random_word_letters = set(x[0].lower() for x in random_word)
         for letter in self.random_word_letters.copy():
             if letter not in self.all_letters:
-                self.random_word_letters.remove(letter)
-                self.random_word_letters.add(letter)
+                self.player_commands.add(letter)
 
     def check_game_status(self) -> None:
         """Check whether players lives have exhausted or if player has won"""

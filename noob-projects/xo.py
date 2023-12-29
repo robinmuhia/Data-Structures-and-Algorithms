@@ -312,3 +312,6 @@ class PlayGame:
         """Start this to play multiple tictactoe games."""
         name = input("Name:").title()
         self.start_game(score=score, name=name)
+
+
+PlayGame().play_multilple_games()

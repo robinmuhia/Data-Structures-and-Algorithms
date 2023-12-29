@@ -136,3 +136,6 @@ class Hangman:
                 self.end_game()
                 break
             self.game_logic(player_command=player_command)
+
+
+Hangman().play()

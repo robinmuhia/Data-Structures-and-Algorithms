@@ -4,12 +4,13 @@ from typing import Tuple
 
 
 class Collatz:
+    """An implementation of the collatz conjecture"""
+
     def collatz_conjecture(self, number: int) -> int:
         """The collatz conjecture is a fascinating unproven mathematical
         conjecture whereby the basis is divide a integer by two if its even
-        and mutliply the integer by 3 and add 1, all currently known numbers
-        end up in a loop of 4 -> 2 -> 1 -> 4. This function prints the current
-        number we are on.
+        and mutliply the integer by 3 and add 1 if its odd, all
+        currently known numbers end up in a loop of 4 -> 2 -> 1 -> 4.
         """
         print(number)
         if number == 1:
